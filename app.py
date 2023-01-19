@@ -1,19 +1,18 @@
-from flask import Flask, render_template, request, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy #БД
+from flask import Flask, render_template, url_for, redirect
+from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 from flask_bcrypt import Bcrypt
-from cloudipsp import Api, Checkout #система оплаты
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Магазин.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SECRET_KEY'] = 'thisisasecretkey'
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
+
+
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -57,52 +56,11 @@ class LoginForm(FlaskForm):
 
     submit = SubmitField('Login')
 
-class Product(db.Model):
-    id = db.Column(db.Integer, primary_key=True) #id товара
-    name = db.Column(db.String(50), nullable=False) # название
-    price = db.Column(db.Integer, nullable=False) #цена
-    text = db.Column(db.Text, nullable=False) #описание товара
-    def __repr__(self):
-        return self.name
-
-with app.app_context():
-    db.create_all()
 
 @app.route('/')
-def mainMenu(): #функция главной страницы
-    products = Product.query.all()
-    return render_template("mainMenu.html", data=products)
+def home():
+    return render_template('home.html')
 
-@app.route('/about')
-def about(): 
-    return render_template("about.html")
-
-@app.route('/buy/<int:id>')
-def buy(id):
-    product = Product.query.get(id)
-    api = Api(merchant_id=1396424,
-          secret_key='test')
-    checkout = Checkout(api=api)
-    data = {"currency": "RUB", 
-    "amount": str(product.price) + "00"}
-    url = checkout.url(data).get('checkout_url') 
-    return redirect(url) #переадресация, чтобы была не ссылка, а сама страница   
-
-@app.route('/addProduct', methods=['POST','GET'])
-def addProduct():
-    if request.method == "POST":
-        nameProduct = request.form['name']
-        price = request.form['price']
-        text = request.form['text']
-        product = Product(name=nameProduct, price = price, text=text)
-        try:
-            db.session.add(product)
-            db.session.commit()
-            return redirect('/') # возращает пользователя на главную страницу
-        except:
-            return "Error в вводе"
-    else:
-        return render_template("addProduct.html")    
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -141,6 +99,7 @@ def register():
         return redirect(url_for('login'))
 
     return render_template('register.html', form=form)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
