@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>Магазин продуктов</title>
+{% endblock %}
+
+{% block body %}
+<div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+    <h1 class="display-4 fw-normal">Меню</h1>
+    <p class="fs-5 text-muted">Здесь можно найти все необходимые продукты на любой вкус!</p>
+  </div>
+</header>
+
+<main>
+  <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+  {% for elem in data %}
+  <div class="card mb-4 rounded-3 shadow-sm">
+    <div class="card-header py-3">
+      <h4 class="my-0 fw-normal">{{elem.name}}</h4>
+    </div>
+    <div class="card-body">
+      <h1 class="card-title pricing-card-title">{{elem.price}}<small class="text-muted fw-light">руб</small></h1>
+      <ul class="list-unstyled mt-3 mb-4">
+        <li>{{elem.text}}</li>
+      </ul>
+      <a href="/buy/{{elem.id}}" class="btn btn-lg btn-block btn-outline-primary">Купить продукт</a>
+    </div>
+  </div>
+  {% endfor %}
+{% endblock %}
