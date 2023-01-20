@@ -34,7 +34,7 @@ with app.app_context():
 @login_required
 def mainMenu(): #функция главной страницы
     products = Product.query.all()
-    return render_template("dashboard.html", data=products)
+    return render_template("mainMenu.html", data=products)
 
 @app.route('/team')
 def team():
@@ -121,14 +121,14 @@ def login():
         if user:
             if bcrypt.check_password_hash(user.password, form.password.data):
                 login_user(user)
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('mainMenu'))
     return render_template('login.html', form=form)
 
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
+    return render_template('mainMenu.html')
 
 
 @app.route('/logout', methods=['GET', 'POST'])
